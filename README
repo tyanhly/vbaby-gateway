@@ -1,0 +1,50 @@
+# README
+
+DEV guide
+
+# CREATE AND START CONTAINER
+
+```
+docker-compose up -d
+docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d baby_frontend_app
+docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d baby_frontend_api
+docker-compose up -d mariadb
+```
+
+# LIST CONTAINERS
+
+```
+docker ps -a
+```
+
+# ENTER CONTAINER
+
+```
+docker exec -it baby_frontend_app bash
+docker exec -it baby_frontend_api bash
+docker exec -it mariadb bash
+```
+
+# START
+
+```
+docker start -f baby_frontend_app
+docker start -f baby_frontend_api
+docker start -f $(docker ps -a -q)v
+```
+
+# STOP
+
+```
+docker stop -f baby_frontend_app
+docker stop -f baby_frontend_api
+docker stop -f $(docker ps -a -q)v
+```
+
+# REMOVE
+
+```
+docker rm -f baby_frontend_app
+docker rm -f baby_frontend_api
+docker rm -f $(docker ps -a -q)
+```
