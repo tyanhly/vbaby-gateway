@@ -65,12 +65,15 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
-      
+      export LC_CTYPE=en_US.UTF-8
+      export LC_ALL=en_US.UTF-8
       apt-get update -y
-      apt-get upgrade -y
-      apt-get install nodejs -y
-      apt-get install nodejs-legacy -y
-      apt-get install npm -y
-      npm install -g nodemon
+      apt-get install curl vim build-essential -y
+      curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+      apt-get install -y nodejs
+      npm install -g npm@4.1.1
+      npm install -g cordova
+      npm install -g ionic
+
    SHELL
 end
