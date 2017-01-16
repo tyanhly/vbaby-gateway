@@ -1,3 +1,6 @@
 /.vagrant
-/frontend_api
-/frontend_app
+/vbaby_api
+/vbaby_mobile
+/.idea
+/vbaby_mysql
+/*.log

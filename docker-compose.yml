@@ -3,59 +3,44 @@ networks:
   app-tier:
     driver: bridge
 services:
-  default_base_service:
-    image: ubuntu:16.04
+
+  vbaby_mobile:
     dns: 8.8.8.8
-    environment:
-      TERM: linux
-    restart: on-failure:3
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "2"
     networks:
       - app-tier
-
-  baby_frontend_app:
-    extends:
-      service: default_base_service
-    image: baby_frontend_app
-    container_name: baby_frontend_app
-    build: ./frontend_app
+    image: vbaby/mobile
+    container_name: mobile
+    build: ./vbaby_mobile
+    volumes:
+      - ./vbaby_mobile:/var/www/html/app
     ports:
       - "8000:80"
-    entrypoint: /entrypoint.sh
+    entrypoint: /var/www/html/app/entrypoint.sh
+    working_dir: /var/www/html/app
 
-  baby_frontend_api:
-    image: vcode/baby_frontend_api
-    container_name: baby_frontend_api
-    build: ./frontend_api
+  vbaby_api:
+    dns: 8.8.8.8
+    networks:
+      - app-tier
+    image: vbaby/phpapi
+    container_name: phpapi
+    build: ./vbaby_api
     ports:
       - "8001:80"
-    environment:
-      APP_ENV: production
-      DB_HOST: mariadb
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: baby_tracking
-      DB_PORT: 3306
-    # depends_on:
-      # - mariadb
     volumes:
-      - ./frontend_api:/var/www/html/app
-  
-  mariadb:
-    extends:
-      service: default_base_service
-    container_name: mariadb
-    image: bitnami/mariadb
+      - ./vbaby_api:/var/www/html/app
+    entrypoint: /var/www/html/app/entrypoint.sh
+    working_dir: /var/www/html/app
+
+  mysql:
+    dns: 8.8.8.8
+    networks:
+      - app-tier
+    container_name: mysql
+    image: vietcode/mysql
     volumes:
-      - /data/mariadb/data:/bitnami/mariadb/data
-      - /data/mariadb/conf:/bitnami/mariadb/conf
-    environment:
-      MARIADB_PASSWORD: root
-      MARIADB_DATABASE: baby
+      - ./vbaby_mysql/data:/var/lib/mysql
+      - ./vbaby_mysql/run:/var/run/mysqld
     ports:
       - '3306:3306'
-  
+#
