@@ -1,6 +1,6 @@
 [submodule "vbaby_api"]
         path = vbaby_api
         url = https://github.com/tyanhly/vbaby_api.git
-[submodule "frontend_app"]
+[submodule "vbaby_mobile"]
         path = vbaby_mobile
         url = https://github.com/tyanhly/vbaby_mobile.git

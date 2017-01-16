@@ -13,4 +13,5 @@ Vagrant.configure("2") do |config|
     SHELL
 
   config.vm.provision "shell", path: "provision.sh"
+
 end
