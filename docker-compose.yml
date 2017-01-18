@@ -2,14 +2,24 @@ version: '2'
 networks:
   app-tier:
     driver: bridge
-services:
+    ipam:
+      config:
+      - subnet: 172.19.0.0/24
+        gateway: 172.19.0.1
 
-  vbaby_mobile:
+services:
+  webapp:
+    image: ubuntu
     dns: 8.8.8.8
+    env_file: .env
+  vbaby_mobile:
+    extends:
+      service: webapp
     networks:
-      - app-tier
-    image: vbaby/mobile
-    container_name: mobile
+      app-tier:
+        ipv4_address: ${MOBILE_IPADDRESS}
+    image: vietcode/nodejs7
+    container_name: vbaby_mobile
     build: ./vbaby_mobile
     volumes:
       - ./vbaby_mobile:/var/www/html/app
@@ -17,13 +27,15 @@ services:
       - "8000:80"
     entrypoint: /var/www/html/app/entrypoint.sh
     working_dir: /var/www/html/app
+    environment:
+      PHPAPI_IPADDRESS: ${PHPAPI_IPADDRESS}
 
   vbaby_api:
-    dns: 8.8.8.8
     networks:
-      - app-tier
+      app-tier:
+        ipv4_address: ${PHPAPI_IPADDRESS}
     image: vbaby/phpapi
-    container_name: phpapi
+    container_name: vbaby_api
     build: ./vbaby_api
     ports:
       - "8001:80"
@@ -31,16 +43,21 @@ services:
       - ./vbaby_api:/var/www/html/app
     entrypoint: /var/www/html/app/entrypoint.sh
     working_dir: /var/www/html/app
+    environment:
+      MYSQL_IPADDRESS: ${DB_IPADDRESS}
 
-  mysql:
-    dns: 8.8.8.8
+  vbaby_db:
     networks:
-      - app-tier
-    container_name: mysql
-    image: vietcode/mysql
-    volumes:
-      - ./vbaby_mysql/data:/var/lib/mysql
-      - ./vbaby_mysql/run:/var/run/mysqld
+      app-tier:
+        ipv4_address: ${DB_IPADDRESS}
+    container_name: vbaby_db
+    image: vietcode/mariadb
     ports:
       - '3306:3306'
+    environment:
+      DB_NAME: "vbaby"
+    entrypoint: /data/entrypoint.sh
+    volumes:
+        - ./vbaby_db:/data
+
 #

@@ -2,5 +2,5 @@
 /vbaby_api
 /vbaby_mobile
 /.idea
-/vbaby_mysql
+/vbaby_db/*
 /*.log

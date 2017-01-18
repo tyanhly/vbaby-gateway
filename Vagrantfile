@@ -1,6 +1,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.network "private_network", ip: "100.100.100.100"
 
    config.vm.provision "shell", inline: <<-SHELL
        apt-get install apt-transport-https ca-certificates -y
@@ -10,8 +10,6 @@ Vagrant.configure("2") do |config|
        apt-get install docker docker-compose
        usermod -aG docker $(whoami)
        service docker start
+       cd /vagrant
     SHELL
-
-  config.vm.provision "shell", path: "provision.sh"
-
 end
