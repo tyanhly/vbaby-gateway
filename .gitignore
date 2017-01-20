@@ -4,3 +4,4 @@
 /.idea
 /vbaby_db/*
 /*.log
+/docker

@@ -8,56 +8,64 @@ networks:
         gateway: 172.19.0.1
 
 services:
-  webapp:
-    image: ubuntu
-    dns: 8.8.8.8
-    env_file: .env
-  vbaby_mobile:
-    extends:
-      service: webapp
-    networks:
-      app-tier:
-        ipv4_address: ${MOBILE_IPADDRESS}
-    image: vietcode/nodejs7
-    container_name: vbaby_mobile
-    build: ./vbaby_mobile
-    volumes:
-      - ./vbaby_mobile:/var/www/html/app
-    ports:
-      - "8000:80"
-    entrypoint: /var/www/html/app/entrypoint.sh
-    working_dir: /var/www/html/app
-    environment:
-      PHPAPI_IPADDRESS: ${PHPAPI_IPADDRESS}
+
 
   vbaby_api:
+    env_file:
+      - .env
+      - ./vbaby_api/.env
+    dns: 8.8.8.8
     networks:
       app-tier:
-        ipv4_address: ${PHPAPI_IPADDRESS}
-    image: vbaby/phpapi
+        ipv4_address: ${API_IPADDRESS}
+    image: vbaby/api
     container_name: vbaby_api
     build: ./vbaby_api
     ports:
       - "8001:80"
     volumes:
-      - ./vbaby_api:/var/www/html/app
-    entrypoint: /var/www/html/app/entrypoint.sh
-    working_dir: /var/www/html/app
+      - ./vbaby_api:${APP_SOURCE_PATH}
+    working_dir: ${APP_SOURCE_PATH}
     environment:
-      MYSQL_IPADDRESS: ${DB_IPADDRESS}
+      DOCUMENT_ROOT: ${API_DOCUMENT_ROOT}
+
+
+  vbaby_mobile:
+    env_file:
+      - .env
+      - ./vbaby_mobile/.env
+    dns: 8.8.8.8
+    networks:
+      app-tier:
+        ipv4_address: ${MOBILE_IPADDRESS}
+    image: vbaby/mobile
+    container_name: vbaby_mobile
+    build: ./vbaby_mobile
+    volumes:
+      - ./vbaby_mobile:${APP_SOURCE_PATH}
+    ports:
+      - "8000:80"
+    working_dir: ${APP_SOURCE_PATH}
+    command:
+      - npm install
+      - ionic serve
+
 
   vbaby_db:
+    env_file:
+      - vbaby_api/.env
+      - .env
     networks:
       app-tier:
         ipv4_address: ${DB_IPADDRESS}
     container_name: vbaby_db
-    image: vietcode/mariadb
+    image: mariadb
     ports:
       - '3306:3306'
     environment:
-      DB_NAME: "vbaby"
-    entrypoint: /data/entrypoint.sh
-    volumes:
-        - ./vbaby_db:/data
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: ${API_DB_DATABASE}
+      MYSQL_USER: ${API_DB_USERNAME}
+      MYSQL_PASSWORD: ${API_DB_PASSWORD}
 
 #
